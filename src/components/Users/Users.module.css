@@ -1,0 +1,36 @@
+.users_page_section {
+    width: 100%;
+    margin: 0;
+}
+
+.user_container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding: 15px;
+
+    -webkit-box-shadow: 9px 9px 30px -17px rgba(94, 100, 107, 1);
+    -moz-box-shadow: 9px 9px 30px -17px rgba(94, 100, 107, 1);
+    box-shadow: 9px 9px 30px -17px rgba(94, 100, 107, 1);
+}
+
+.userName {
+    color: #0e6dfd;
+    margin-bottom: 10px;
+}
+
+.selectedPage {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.notSelected {
+    font-weight: normal;
+    margin-right: 5px;
+}
+
+.avatar{
+    width: 20%;
+}
