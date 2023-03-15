@@ -1,3 +1,6 @@
+import {profileAPI, usersAPI} from "../api/api";
+import {Dispatch} from "redux";
+
 export type UserProfileType = {
     userId: number
     lookingForAJob: boolean
@@ -25,13 +28,9 @@ export type PostType = {
     id: number
 }
 
-export type postTextOnchangeACType = {
-    type: "POST-TEXT-ONCHANGE",
-    newText: string,
-}
-
 export type addPostACType = {
-    type: "ADD-POST"
+    type: "ADD-POST",
+    messageForNewPost: string
 }
 
 export type setUserProfileACType = {
@@ -39,7 +38,12 @@ export type setUserProfileACType = {
     profile: UserProfileType
 }
 
-export type ProfileReducerActionsTypes = addPostACType | postTextOnchangeACType | setUserProfileACType
+export type setStatusType = {
+    status: string,
+    type: "SET-STATUS",
+}
+
+export type ProfileReducerActionsTypes = addPostACType | setUserProfileACType | setStatusType
 
 export type initialProfileStateType = typeof initialState
 
@@ -50,7 +54,8 @@ let initialState = {
         {id: 2, message: 'Hello, good morning!', likesCount: 5},
         {id: 3, message: 'Hi, how are you?', likesCount: 10},
     ] as PostType[],
-    profile: null as UserProfileType | null
+    profile: null as UserProfileType | null,
+    status: "" as string
 }
 
 export const profileReducer = (state: initialProfileStateType = initialState, action: ProfileReducerActionsTypes): initialProfileStateType => {
@@ -60,37 +65,72 @@ export const profileReducer = (state: initialProfileStateType = initialState, ac
             return {
                 ...state, posts: [...state.posts, {
                     id: new Date().getTime(),
-                    message: state.messageForNewPost,
+                    message: action.messageForNewPost,
                     likesCount: 0,
-                }], messageForNewPost: '',
+                }]
             }
-        case "POST-TEXT-ONCHANGE":
-            return {...state, messageForNewPost: action.newText}
+
         case "SET-USER-PROFILE":
-            return{
+            return {
                 ...state, profile: action.profile
+            }
+        case "SET-STATUS":
+            return {
+                ...state, status: action.status
             }
         default:
             return state
     }
 }
 
-export const addPostAC = (): addPostACType => {
-    return {
-        type: "ADD-POST"
-    } as const
-}
-
-export const postTextOnchangeAC = (newText: string): postTextOnchangeACType => {
-    return {
-        type: "POST-TEXT-ONCHANGE",
-        newText: newText,
-    } as const
+export const addPostAC = (messageForNewPost: string): addPostACType => {
+    return {type: "ADD-POST", messageForNewPost} as const
 }
 
 export const setUserProfile = (profile: UserProfileType): setUserProfileACType => {
     return {
         type: "SET-USER-PROFILE",
         profile: profile
+    }
+}
+
+export const setStatusAC = (status: string): setStatusType => {
+    return {
+        type: "SET-STATUS",
+        status: status
+    } as const
+}
+
+export const getUserProfileThunk = (userId: number) => {
+    return (dispatch: Dispatch) => {
+
+        profileAPI.getProfile(userId)
+            .then(response => {
+                dispatch(setUserProfile(response.data));
+            })
+    }
+}
+
+export const getStatus = (userId: number) => {
+    return (dispatch: Dispatch) => {
+
+        profileAPI.getStatus(userId)
+            .then(response => {
+                dispatch(setStatusAC(response.data))
+            })
+
+    }
+}
+
+export const updateStatus = (status: string) => {
+    return (dispatch: Dispatch) => {
+        profileAPI.updateStatus(status)
+            .then(response => {
+                console.log(response)
+                if (response.data.resultCode === 0) {
+                    dispatch(setStatusAC(status))
+                }
+            })
+
     }
 }

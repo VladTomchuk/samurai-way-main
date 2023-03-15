@@ -1,14 +1,16 @@
 import React from "react";
-// import s from './Profile.module.css';
-// import {ProfileItem} from "./ProfileItem/ProfileItem";
-// import {MyPostsContainer} from "./MyPosts/MyPostsContainer";
 import {connect} from "react-redux";
 import {Profile} from "./Profile";
-import {default as axios} from "axios";
-import {setUserProfile, UserProfileType} from "../../state/profile-reducer";
+import {
+    getStatus,
+    getUserProfileThunk,
+    updateStatus,
+    UserProfileType
+} from "../../state/profile-reducer";
 import {AppStateType} from "../../state/redux-store";
 import {RouteComponentProps, withRouter} from "react-router-dom";
-import {usersAPI} from "../../api/api";
+import {compose} from "redux";
+import {WithAuthRedirect} from "../../hoc/WithAuthRedirect";
 
 
 type PathParamsType = {
@@ -16,41 +18,47 @@ type PathParamsType = {
 }
 
 type mapStateToPropsType = {
-    profile: UserProfileType | null
-
+    profile: UserProfileType | null,
+    status: string
 }
 
 type mapDispatchToPropsType = {
-    setUserProfile: (profile: UserProfileType) => void
+    getUserProfileThunk: (userId: number) => void
+    getStatus: (userId: number) => void
+    updateStatus: (status:string) => void
 }
 
 export type UserProfilePropsType = mapDispatchToPropsType & mapStateToPropsType
 
-type PropsType = RouteComponentProps<PathParamsType> & UserProfilePropsType
+export type PropsType = RouteComponentProps<PathParamsType> & UserProfilePropsType
 
 class ProfileContainer extends React.Component<PropsType> {
 
     componentDidMount() {
         let userId = +this.props.match.params.userId
         if (!userId) {
-            userId = 2
+            userId = 27878
         }
-        usersAPI.profile(userId)
-            .then(response => {
-                this.props.setUserProfile(response.data);
-            })
+        this.props.getUserProfileThunk(userId)
+        this.props.getStatus(userId)
     }
-
     render() {
-        return <Profile {...this.props} profile={this.props.profile}/>
+        return <Profile
+            {...this.props}
+            profile={this.props.profile}
+            status={this.props.status}
+            updateStatus={this.props.updateStatus}
+        />
     }
-
 }
 
 let mapStateToProps = (state: AppStateType): mapStateToPropsType => ({
-    profile: state.profileReducer.profile
-}) // Когда функция возвращает обьект нужно оборачивать в круглые скобки тело обекта
+    profile: state.profileReducer.profile,
+    status: state.profileReducer.status
+}) // Когда функция возвращает обьект нужно оборачивать в круглые скобки тело обекта (чтоб не писать return)
 
-let WithURLDataContainerComponent = withRouter(ProfileContainer)
-
-export default connect(mapStateToProps, {setUserProfile})(WithURLDataContainerComponent)
+export default compose<React.ComponentType>(
+    connect(mapStateToProps, {getUserProfileThunk, getStatus, updateStatus}), //#3
+    withRouter, //#2
+    WithAuthRedirect, //#1
+)(ProfileContainer)

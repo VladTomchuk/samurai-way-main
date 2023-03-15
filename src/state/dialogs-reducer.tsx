@@ -1,14 +1,9 @@
-export type dialogTextOnchangeACType = {
-    type: "DIALOG-TEXT-ONCHANGE",
-    dialogTextBody: string
-}
-
 export type sendDialogMessageACType = {
     type: "SEND-DIALOG-MESSAGE",
-    sendMessage: string,
+    newDialogsMessageBody: string,
 }
 
-export type DialogsReducerActionsTypes = dialogTextOnchangeACType | sendDialogMessageACType
+export type DialogsReducerActionsTypes = sendDialogMessageACType
 
 export type MessageType = {
     id: number
@@ -35,39 +30,26 @@ let initialState = {
         {id: 1, message: "Hey dear!"},
         {id: 2, message: "What's gonna on?"},
         {id: 3, message: "Don't repeat yourself!"},
-    ] as MessageType[],
-    newDialogMessage: ''
+    ] as MessageType[]
 }
 
 export const dialogsReducer = (state: initialDialogsPageType = initialState, action: DialogsReducerActionsTypes): initialDialogsPageType => {
 
     switch (action.type) {
-        case "DIALOG-TEXT-ONCHANGE":
-            return {...state, newDialogMessage: action.dialogTextBody}
         case "SEND-DIALOG-MESSAGE":
             return {
                 ...state,
                 messages:
                     [...state.messages, {
                         id: new Date().getTime(),
-                        message: action.sendMessage,
-                    }], newDialogMessage: '',
+                        message: action.newDialogsMessageBody,
+                    }]
             }
         default:
             return state
     }
 }
 
-export const dialogTextOnchangeAC = (dialogTextBody: string): dialogTextOnchangeACType => {
-    return {
-        type: "DIALOG-TEXT-ONCHANGE",
-        dialogTextBody: dialogTextBody
-    } as const
-}
-
-export const sendDialogMessageAC = (sendMessage: string): sendDialogMessageACType => {
-    return {
-        type: "SEND-DIALOG-MESSAGE",
-        sendMessage: sendMessage,
-    } as const
+export const sendDialogMessageAC = (newDialogsMessageBody: string): sendDialogMessageACType => {
+    return {type: "SEND-DIALOG-MESSAGE", newDialogsMessageBody} as const
 }

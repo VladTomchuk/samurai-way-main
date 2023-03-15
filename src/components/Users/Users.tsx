@@ -14,7 +14,6 @@ type UsersRenderType = {
     users: UserType[] // Знаю что так нельзя делать (импортить с редьюсера)
     unfollow: (userId: number) => void
     follow: (userId: number) => void
-    //toggleFollowingProgress: (isFetching: boolean, userId: number) => void
     followingInProgress: Array<number>
 }
 
@@ -25,6 +24,7 @@ let Users = (props: UsersRenderType) => {
     for (let i = 1; i <= pagesCount; i++) {
         pages.push(i)
     }
+
 
     return <div className={s.users_page_section}>
         <div>

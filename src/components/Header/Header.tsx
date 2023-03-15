@@ -11,7 +11,9 @@ export const Header = (props:commonMapsToPropsType) => {
             <img src="https://logos-world.net/wp-content/uploads/2020/12/Lays-Logo.png" alt=""/>
 
             <div className={s.loginBlock}>
-                {props.data.isAuth ? props.data.login : <NavLink to={'/login'}>Login</NavLink>}
+                {props.data.isAuth
+                    ? <div>{props.data.login} - <button onClick={props.logOut}>Log out</button></div>
+                    : <NavLink to={'/login'}>Login</NavLink>}
 
             </div>
         </header>

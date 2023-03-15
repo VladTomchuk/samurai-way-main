@@ -2,7 +2,11 @@ import React, {ChangeEvent} from "react";
 import s from './MyPosts.module.css';
 import {Post} from "./Post/Post";
 import {profilePageType} from "./MyPostsContainer";
+import {Field, reduxForm} from "redux-form";
+import {maxLengthCreator, required} from "../../../validators";
+import {Textarea} from "../../common/formsControls/FormsControls";
 
+const maxLength10 = maxLengthCreator(10)
 
 export const MyPosts = (props: profilePageType) => {
 
@@ -10,23 +14,30 @@ export const MyPosts = (props: profilePageType) => {
 
     let posts = state.posts.map(p => <Post key={p.id} id={p.id} message={p.message} likesCount={p.likesCount}/>)
 
-    const onAddPost = () => {
-        props.addPost()
-    }
-
-    const newTextChangeHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        let newText = e.currentTarget.value
-        props.newTextChangeHandler(newText)
+    const onAddPost = (values: any) => {
+        props.addPost(values.messageForNewPost)
     }
 
     return (
         <div>
             My posts
-            <div>
-                <textarea value={state.messageForNewPost} onChange={newTextChangeHandler}/>
-                <button onClick={onAddPost}>Add post</button>
-            </div>
+            <MessageForNewPostFormRedux onSubmit={onAddPost}/>
             {posts}
         </div>
     )
 }
+
+const MessageForNewPostForm = (props: any) => {
+    return (
+        <form onSubmit={props.handleSubmit}>
+            <Field
+                placeholder={"Type here something..."}
+                name={"messageForNewPost"}
+                component={Textarea}
+                validate={[required, maxLength10]}/>
+            <button>Add post</button>
+        </form>
+    )
+}
+
+const MessageForNewPostFormRedux = reduxForm({form: "MessageForNewPostForm"})(MessageForNewPostForm)
